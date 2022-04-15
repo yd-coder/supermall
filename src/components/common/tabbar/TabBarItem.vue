@@ -32,7 +32,7 @@ export default {
       default:'red'
     }
   },
-  
+    
   methods: {
     itemClick(){
       if (this.$route.path !== this.path){ 
@@ -54,6 +54,6 @@ export default {
   width: 23px;
   height: 23px;
   margin-top: 5px;
-  vertical-align: middle;
+  vertical-align: middle; /*清除图片底部与文字默认间距*/
 }
 </style>
