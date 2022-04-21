@@ -2,14 +2,14 @@
   <div class="wrapper" ref="wrapper">
     <div class="content">
       <slot></slot>
-      <div class="pullup-tips">
-          <div v-if="!isPullUpLoad" class="before-trigger">
+      <div class="pullup-tips" v-if="pullUpLoad">
+          <div v-if="!pullUpLoad" class="before-trigger">
             <span class="pullup-txt">下拉刷新更多</span>
           </div>
           <div v-else class="after-trigger">
             <span class="pullup-txt">正在努力加载中...</span>
           </div>
-        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -31,8 +31,7 @@ export default {
 
   data() {
     return {
-      isPullUpLoad: false,
-      scroll: null
+      scroll: null,
     };
   },
 

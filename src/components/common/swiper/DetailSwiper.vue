@@ -35,7 +35,7 @@ img{
    width: 100%;
 }
 .detailSwiper {
-  height: 300px;
+  height: 350px;
   overflow: hidden;
 }
 </style>
