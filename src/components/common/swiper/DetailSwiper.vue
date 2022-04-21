@@ -1,8 +1,8 @@
 <template>
   <div>
-    <van-swipe :autoplay="2000" indicator-color="white" class="home-swiper">
+    <van-swipe :autoplay="2000" indicator-color="red" class="detailSwiper">
       <van-swipe-item v-for="item in banner" :key="item.index">
-        <img :src="item.image" alt=""/>
+        <img :src="item" alt=""/>
       </van-swipe-item>
     </van-swipe>
   </div>
@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'Swiper',
+  name: 'DetailSwiper',
   props:{
     banner:Array
   },
@@ -31,12 +31,11 @@ export default {
 </script>
 
 <style scoped>
-.home-swiper {
-  height: 180px;
-}
 img{
-  height: 100%;
-  width: 100%;
+   width: 100%;
 }
- 
+.detailSwiper {
+  height: 300px;
+  overflow: hidden;
+}
 </style>

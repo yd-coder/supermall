@@ -1,10 +1,12 @@
 import Vue from 'vue'
 import router from './router'
 import store from './store'
-import './plugins/element.js'
+import { Swipe, SwipeItem } from 'vant'
+import 'vant/lib/index.css';
 import App from './App.vue'
 
-
+Vue.use(Swipe);
+Vue.use(SwipeItem);
 Vue.config.productionTip = false
 
 new Vue({

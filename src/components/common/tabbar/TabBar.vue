@@ -10,9 +10,7 @@ export default{  //导出TabBar.vue
 }
 </script>
 
-<style>
-/* @import "./assets/css/base.css"; */
-
+<style scoped>
 #tabbar{
   display: flex;
   background-color: #f6f6f6;
