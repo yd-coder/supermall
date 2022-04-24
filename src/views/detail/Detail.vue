@@ -8,27 +8,37 @@
         <div v-for="(item,index) in titles" :key="index" class="title-item" :class="{active:index === currentIndex}" @click="titleClick(index)">{{item}}</div>
       </div>
     </nav-bar>
-    <scroll class="content">
+    <scroll class="content" ref="scroll" :probeType="3" @scroll="contentScroll">
       <detail-swiper :banner="topImages"></detail-swiper>
       <detail-base-info :goods="goods"></detail-base-info>
       <detail-shop-info :shop="shop"></detail-shop-info>
+      <detail-goods-info :detailInfo="detailInfo" @imgLoad="detailImageLoad"></detail-goods-info>
+      <detail-param-info :paramInfo="paramInfo" ref="param"></detail-param-info>
+      <detail-comment-info :commentInfo="commentInfo" ref="comment"></detail-comment-info>
+      <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
   </div>
 </template>
 
 <script>
+import {debounce} from '@/common/debounce.js'
+
 import NavBar from '@/components/common/navbar/NavBar';
 import DetailSwiper from '@/components/common/swiper/DetailSwiper'
 import Scroll from '@/components/common/scroll/Scroll'
 
 import DetailBaseInfo from '@/components/content/detailBaseInfo/DetailBaseInfo';
 import DetailShopInfo from '@/components/content/detailShopInfo/DetailShopInfo';
+import DetailGoodsInfo from '@/components/content/detailGoodsInfo/DetailGoodsInfo';
+import DetailParamInfo from '@/components/content/detailParamInfo/DetailParamInfo';
+import DetailCommentInfo from '@/components/content/detailCommentInfo/DetailCommentInfo';
+import GoodsList from '@/components/content/goods/GoodsList';
 
-import {getDetail,Goods,Shop,GoodsParam} from '@/network/detail'
+import {getDetail,Goods,Shop,GoodsParam, getRecommend} from '@/network/detail'
 
 export default {
   name: 'Detail',
-  components:{NavBar,DetailSwiper,DetailBaseInfo,DetailShopInfo,Scroll},
+  components:{NavBar, DetailSwiper, DetailBaseInfo, DetailShopInfo, Scroll, DetailGoodsInfo, DetailParamInfo, DetailCommentInfo, GoodsList},
   data() {
     return {
       iid: null,
@@ -36,7 +46,13 @@ export default {
       currentIndex:0,
       topImages:[],
       goods:{},
-      shop:{}
+      shop:{},
+      detailInfo:{},
+      paramInfo:{},
+      commentInfo:{},
+      recommends:[],
+      themeTopY:[],
+      getThemeTopY:null
     };
   },
 
@@ -49,17 +65,49 @@ export default {
     getDetail(this.iid).then(res => {
       const data = res.result
       this.topImages = data.itemInfo.topImages
-      this.goods = new Goods(data.itemInfo,data.columns,data.shopInfo.services) // 创建商品信息对象
+      this.goods = new Goods(data.itemInfo, data.columns, data.shopInfo.services) // 创建商品信息对象
       this.shop = new Shop(data.shopInfo) // 创建店铺信息对象
+      this.detailInfo = data.detailInfo //商品详情信息
+      this.paramInfo = new GoodsParam(data.itemParams.info, data.itemParams.rule) // 商品参数信息
+      if(data.rate.cRate !== 0){
+        this.commentInfo = data.rate.list[0]
+      }
     })
+    getRecommend().then(res=>{
+      this.recommends = res.data.list
+    })
+    this.getThemeTopY = debounce(()=>{
+        this.themeTopY = []
+        this.themeTopY.push(0)
+        this.themeTopY.push(this.$refs.param.$el.offsetTop)
+        this.themeTopY.push(this.$refs.comment.$el.offsetTop)
+        this.themeTopY.push(this.$refs.recommend.$el.offsetTop)
+      },800)
   },
 
   methods: {
+    //详情页tab栏点击
     titleClick(index){
       this.currentIndex = index
+      this.$refs.scroll.scroll.scrollTo(0,-this.themeTopY[index],200)
     },
+    //详情页返回点击
     backClick(){
       this.$router.back()
+    },
+    //详情页防抖图片加载传入子组件offset
+    detailImageLoad(){
+     this.getThemeTopY()
+    },
+    //详情页滚动事件
+    contentScroll(position){
+      const positionY = -position.y
+      let length = this.themeTopY.length;
+				for(let i = 0; i < length; i++){
+					if((i < length - 1 && positionY >= this.themeTopY[i] && positionY < this.themeTopY[i+1]) || (i === length - 1 && positionY >= this.themeTopY[i])){
+						this.currentIndex = i;
+					}
+				}
     }
   },
 };
@@ -68,12 +116,10 @@ export default {
 <style scoped>
 #detail {
   position: relative;
-  z-index: 9;
-  background-color: #fff;
 }
 .detail-nav {
   position: relative;
-  z-index: 9;
+  z-index: 10;
   background-color: #fff;
 }
 .title {
@@ -91,9 +137,11 @@ export default {
 }
 .content {
   position: absolute;
+  height: 100vh;
   top: 44px;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 9;
 }
 </style>

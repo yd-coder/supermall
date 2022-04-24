@@ -68,4 +68,7 @@ export default {
     text-align: center;
     color: #999;
 }
+.content {
+  background-color: #fff;
+}
 </style>
