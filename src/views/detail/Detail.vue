@@ -17,10 +17,14 @@
       <detail-comment-info :commentInfo="commentInfo" ref="comment"></detail-comment-info>
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
+    <back-top @click.native="backTopClick" v-show="isShowBackTop"></back-top>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
   </div>
 </template>
 
 <script>
+import {Toast} from 'vant'
+
 import {debounce} from '@/common/debounce.js'
 
 import NavBar from '@/components/common/navbar/NavBar';
@@ -33,12 +37,14 @@ import DetailGoodsInfo from '@/components/content/detailGoodsInfo/DetailGoodsInf
 import DetailParamInfo from '@/components/content/detailParamInfo/DetailParamInfo';
 import DetailCommentInfo from '@/components/content/detailCommentInfo/DetailCommentInfo';
 import GoodsList from '@/components/content/goods/GoodsList';
+import DetailBottomBar from '@/components/content/detailBottomBar/DetailBottomBar';
+import BackTop from '@/components/content/backTop/BackTop';
 
 import {getDetail,Goods,Shop,GoodsParam, getRecommend} from '@/network/detail'
 
 export default {
   name: 'Detail',
-  components:{NavBar, DetailSwiper, DetailBaseInfo, DetailShopInfo, Scroll, DetailGoodsInfo, DetailParamInfo, DetailCommentInfo, GoodsList},
+  components:{NavBar, DetailSwiper, DetailBaseInfo, DetailShopInfo, Scroll, DetailGoodsInfo, DetailParamInfo, DetailCommentInfo, GoodsList, DetailBottomBar, BackTop},
   data() {
     return {
       iid: null,
@@ -52,7 +58,8 @@ export default {
       commentInfo:{},
       recommends:[],
       themeTopY:[],
-      getThemeTopY:null
+      getThemeTopY:null,
+      isShowBackTop:false
     };
   },
 
@@ -95,12 +102,17 @@ export default {
     backClick(){
       this.$router.back()
     },
+    //返回顶部点击
+    backTopClick(){
+      this.$refs.scroll.scroll.scrollTo(0,0,500)
+    },
     //详情页防抖图片加载传入子组件offset
     detailImageLoad(){
      this.getThemeTopY()
     },
     //详情页滚动事件
     contentScroll(position){
+      this.isShowBackTop = (-position.y) > 1000
       const positionY = -position.y
       let length = this.themeTopY.length;
 				for(let i = 0; i < length; i++){
@@ -108,6 +120,30 @@ export default {
 						this.currentIndex = i;
 					}
 				}
+    },
+    // 购物车点击
+    addToCart(){
+      const product = {}
+            product.image = this.topImages[0];
+            product.title = this.goods.title;
+            product.desc = this.goods.desc;
+            product.price = this.goods.realPrice;
+            product.iid = this.iid;
+            // 将商品加入购物车
+            // this.$store.commit('addCart',product)
+            // dispatch做个调用到vuex中  任务分发
+            this.$store.dispatch('addCart',product).then(res =>{
+                // this.show = true;
+                // this.message = res;
+
+                // setTimeout(() => {
+                //     this.show = false;
+                //     this.message = ''
+                // },2000)
+                // this.$toast.show(res,2000)
+                // this.$toast(res);
+                Toast.success(res);
+            })
     }
   },
 };
@@ -137,7 +173,7 @@ export default {
 }
 .content {
   position: absolute;
-  height: 100vh;
+  height: calc(100vh - 110px);
   top: 44px;
   bottom: 0;
   left: 0;

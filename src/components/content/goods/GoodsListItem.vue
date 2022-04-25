@@ -84,6 +84,6 @@ export default {
   top: 1px;
   width: 15px;
   height: 15px;
-  background: url("@/assets/img/goods/collect.svg") 0 0/14px 14px;
+  background: url("@/assets/img/home/goods/collect.svg") 0 0/14px 14px;
 }
 </style>
