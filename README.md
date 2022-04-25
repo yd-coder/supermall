@@ -1,4 +1,5 @@
 # vueproject
+项目使用技术vue2 + Better-Scroll + Vant2 ui
 
 ## Project setup
 ```
