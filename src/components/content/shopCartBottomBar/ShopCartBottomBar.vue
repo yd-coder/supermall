@@ -7,13 +7,14 @@
         <div class="price">
             合计：{{totalPrice}}
         </div>
-        <div class="calculate" @click="calculate">
+        <div :class="{calculate,active:$store.state.cartList.filter(item => item.checked).length > 0}" @click="calculate">
             去结算:({{checkedLength}})
         </div>
     </div>
 </template>
 
 <script>
+import { Toast } from 'vant';
 import CheckBtn from '@/components/content/checkGoodsBtn/CheckGoodsBtn'
 export default {
     name:'CartButtonBar',
@@ -51,7 +52,7 @@ export default {
         },
         calculate(){
             if(!this.isCheckedAll){
-                this.$toast.show('请选择需要购买的商品', 2000)
+               Toast.fail('请选择需要购买的商品');
             }
         }
     }
@@ -89,7 +90,9 @@ export default {
         padding-left: 6px;
         background-color: pink;
         color:#fff;
-        text-align: center;
-        
+        text-align: center;        
+    }
+    .active {
+        background-color:var(--color-high-text);
     }
 </style>
