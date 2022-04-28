@@ -1,2 +1,0 @@
-"use strict";(self["webpackChunksupermall"]=self["webpackChunksupermall"]||[]).push([[57],{9057:function(e,n,t){t.r(n),t.d(n,{default:function(){return f}});var u=function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("div",{attrs:{id:"profile"}},[e._v(" 我的 ")])},r=[],l={name:"Profile",data:function(){return{}},mounted:function(){},methods:{}},a=l,s=t(1001),c=(0,s.Z)(a,u,r,!1,null,"6ce73096",null),f=c.exports}}]);
-//# sourceMappingURL=57-legacy.276b8393.js.map
