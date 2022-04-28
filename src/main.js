@@ -3,6 +3,7 @@ import router from './router'
 import store from './store'
 import { Swipe, SwipeItem } from 'vant';
 import { Lazyload } from 'vant';
+import { Sku } from 'vant';
 import 'vant/lib/index.css';
 import App from './App.vue'
 
@@ -13,6 +14,8 @@ Vue.use(SwipeItem);
 Vue.use(Lazyload,{
   loading: require('@/assets/img/common/lazyload.gif')
 });
+// Vant ui商品加购和购买的规格选择弹窗
+Vue.use(Sku);
 Vue.config.productionTip = false
 
 new Vue({

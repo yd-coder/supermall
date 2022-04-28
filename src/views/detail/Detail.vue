@@ -18,7 +18,15 @@
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
     <back-top @click.native="backTopClick" v-show="isShowBackTop"></back-top>
-    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+    <van-sku
+      v-model="isShowSku"
+      :sku="sku"
+      :goods="skuGoods"
+      :show-add-cart-btn="false"
+      :close-on-click-overlay="false"
+      :properties="properties"
+    />
+    <detail-bottom-bar @addCart="addToCart" @buyClick="buyClick"></detail-bottom-bar>
   </div>
 </template>
 
@@ -44,7 +52,7 @@ import {getDetail,Goods,Shop,GoodsParam, getRecommend} from '@/network/detail'
 
 export default {
   name: 'Detail',
-  components:{NavBar, DetailSwiper, DetailBaseInfo, DetailShopInfo, Scroll, DetailGoodsInfo, DetailParamInfo, DetailCommentInfo, GoodsList, DetailBottomBar, BackTop},
+  components:{NavBar, DetailSwiper, DetailBaseInfo, DetailShopInfo, Scroll, DetailGoodsInfo, DetailParamInfo, DetailCommentInfo, GoodsList, DetailBottomBar, BackTop },
   data() {
     return {
       iid: null,
@@ -59,7 +67,21 @@ export default {
       recommends:[],
       themeTopY:[],
       getThemeTopY:null,
-      isShowBackTop:false
+      // 回到顶部显示状态
+      isShowBackTop:false,
+      // 商品规格弹窗显示状态
+      isShowSku:false,
+      sku:{
+        tree:[],
+        list:[],
+        hide_stock: false, // 是否隐藏剩余库存
+        price: '1.00', // 默认价格（单位元）
+        stock_num: 0, // 商品总库存
+      },
+      skuGoods:{
+        picture:"" // 默认商品 sku 缩略图
+      },
+      properties:[],
     };
   },
 
@@ -67,8 +89,10 @@ export default {
    
   },
 
+  // 防止该路由页面在keep-alive里不销毁页面只创建一次只，放created()的话只能拿到一次id
   activated(){
-    this.iid = this.$route.params.iid  // 防止该路由页面在keep-alive里不销毁页面只创建一次只，放created()的话只能拿到一次id
+    this.iid = this.$route.params.iid  
+    // 获取详情页数据
     getDetail(this.iid).then(res => {
       const data = res.result
       this.topImages = data.itemInfo.topImages
@@ -79,17 +103,24 @@ export default {
       if(data.rate.cRate !== 0){
         this.commentInfo = data.rate.list[0]
       }
+      this.skuGoods.picture = data.skuInfo.skus[0].img // 商品规格默认缩略图
+      this.sku.price = ( data.skuInfo.skus[0].nowprice / 100 ).toFixed(2) // 商品规格默认价格
+      this.sku.stock_num = data.skuInfo.skus[0].stock // 商品规格默认库存
+      // this.sku.tree = data.skuInfo.props
+      // this.properties[0].v = data.skuInfo.skus
     })
+    // 获取推荐数据
     getRecommend().then(res=>{
       this.recommends = res.data.list
     })
+    // 防抖获取各组件的offsetTop，不防抖获取的高度不准确
     this.getThemeTopY = debounce(()=>{
         this.themeTopY = []
         this.themeTopY.push(0)
         this.themeTopY.push(this.$refs.param.$el.offsetTop)
         this.themeTopY.push(this.$refs.comment.$el.offsetTop)
         this.themeTopY.push(this.$refs.recommend.$el.offsetTop)
-      },800)
+    },800)
   },
 
   methods: {
@@ -144,6 +175,10 @@ export default {
                 // this.$toast(res);
                 Toast.success(res);
             })
+    },
+    // 立即购买点击
+    buyClick(){
+      this.isShowSku = true
     }
   },
 };
